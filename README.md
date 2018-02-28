@@ -4,6 +4,7 @@ A web solar calculator
 
 To configure and run the app.
 -	Download the project and open the SolarCalculator.html file, it will be opened in your browser.
+- Make sure that all files are in the same folder that of SolarCalculator.html.
 -	To access Google API for maps I have provided my own key in the html file.
 -	Code is written using HTML5, CSS3, Bootstrap, JavaScript.
 -	I have provided all the content distribution network (CDN) links in the html file, so you should be able to run the project without any other software downloaded.
