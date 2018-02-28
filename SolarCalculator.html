@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <title>Places Searchbox</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+      <button onclick="drawPolygon()">draw polygon</button>
+    Heading: <input type="text" readonly id="heading"> degrees
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div id="map"></div>
+
+<script>
+
+ function searchBox() {
+
+  var arr =[];
+            var map = new google.maps.Map(document.getElementById('map'), {
+              center: {lat: 42.361145, lng: -71.057083},
+              zoom: 13,
+              mapTypeId: google.maps.MapTypeId.HYBRID
+            });
+
+            // Create the search box and link it to the UI element.
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+            // Bias the SearchBox results towards current map's viewport.
+            map.addListener('bounds_changed', function() {
+              searchBox.setBounds(map.getBounds());
+            });
+
+            var markers = [];
+            
+            // Listen for the event fired when the user selects a prediction and retrieve
+            // more details for that place.
+            searchBox.addListener('places_changed', function() {
+                  var places = searchBox.getPlaces();
+                  if (places.length == 0) {
+                    return;
+                  }
+
+                  // Clear out the old markers.
+                /* markers.forEach(function(marker) {
+                    marker.setMap(null);
+                  });
+                  markers = [];*/
+
+                  // For each place, get the icon, name and location.
+
+                  var bounds = new google.maps.LatLngBounds();
+                  places.forEach(function(place) {
+                          
+                          if (!place.geometry) {
+                            console.log("Returned place contains no geometry");
+                            return;
+                            
+                          }
+                               // Create a marker for each place.
+             markers.push(new google.maps.Marker({
+                            map: map,
+                            draggable: true,
+                            title: place.name,
+                            position: place.geometry.location
+                          }));
+                  
+                          //get the latitude and longitude values of searched place
+                         lat = place.geometry.location.lat();
+                         long = place.geometry.location.lng();
+                          
+                          //store them into an array
+                          var latlon = [lat,long];                         
+                          var len = arr.length;
+                          arr[len] = latlon;
+                          if (place.geometry.viewport) {
+                            // Only geocodes have viewport
+                            
+                            bounds.union(place.geometry.viewport);
+                          } else {
+                            bounds.extend(place.geometry.location);
+                          }
+                          
+                    });
+                
+                    
+
+                  map.fitBounds(bounds);
+                  
+              //set up the properties of the polygon
+
+                  pol = new google.maps.Polygon({
+                  strokeColor: '#FF0000',
+                  strokeOpacity: 1.0, 
+                  fillOpacity: 0.25,
+                  fillColor: "#FF0000",
+                  strokeWeight: 6,
+                  map: map,
+                });
+    /*//call update function
+      update();
+
+         function update() {
+                /* var path = [
+                  {lat: arr[0][0], lng: arr[0][1]},
+                  {lat: arr[1][0], lng: arr[1][1]},
+                  {lat: arr[2][0], lng: arr[2][1]}
+                  
+                  ];
+                
+                pol.setPath(path);*/
+
+                var path = [];        
+            //get the values for drawing the path   
+                for(i=0;i<=3;i++){
+                  path[i] = {lat: arr[i][0], lng: arr[i][1]};
+  
+                }
+                  console.log("in if"+path.length);
+                  console.log("in if"+path[0]);
+                 
+                 function drawPolygon(){
+                //draw the path  
+                  pol.setPath(path);
+                  
+                 }
+                 var area = google.maps.geometry.spherical.computeArea(pol.getPath());
+
+                 console.log("area = " +area);
+                 document.getElementById('heading').value = area;
+               
+                
+                console.log("out if"+path.length);
+                  console.log("out if"+path[2]);        
+        
+
+            });
+
+  }
+ 
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBygQuM76Ekhio0TfVF5ywAY6HiRRZLPcA&libraries=places,geometry&callback=searchBox"
+         async defer></script>
+  </body>
+</html>
